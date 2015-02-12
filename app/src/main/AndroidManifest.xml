@@ -3,11 +3,17 @@
     package="com.wkuglen.upcomingmatches" >
 
     <uses-sdk
+        android:maxSdkVersion="11"
         android:minSdkVersion="9"
-        android:targetSdkVersion="10"
-        android:maxSdkVersion="11"/>
+        android:targetSdkVersion="10" />
 
-
+    <android:uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
+    <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <android:uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
 
     <application
         android:allowBackup="true"
@@ -26,6 +32,10 @@
         <activity
             android:name=".AddEdit"
             android:label="@string/title_activity_add_edit" >
+        </activity>
+        <activity
+            android:name=".ViewMatches"
+            android:label="@string/title_activity_view_matches" >
         </activity>
     </application>
 

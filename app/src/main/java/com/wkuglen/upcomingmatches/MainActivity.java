@@ -1,37 +1,40 @@
 package com.wkuglen.upcomingmatches;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
+
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+
+import com.google.gson.Gson;
+import com.wkuglen.upcomingmatches.matchmanager.Match;
+import com.wkuglen.upcomingmatches.matchmanager.MatchQueue;
 
 
 public class MainActivity extends ActionBarActivity {
 
+    public static final String PREFS_NAME = "JsonPrefsFile";
+    Gson gson = new Gson();
+    MatchQueue<Match> oldMatchQueue = new MatchQueue<Match>();
+    MatchQueue<Match> newMatchQueue;
 
-    private RetainedFragment dataFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // find the retained fragment on activity restarts
-        FragmentManager fm = getFragmentManager();
-        dataFragment = (RetainedFragment) fm.findFragmentByTag("data");
+        // Restore preferences
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        String json = settings.getString("storedJson", null);
+        newMatchQueue = gson.fromJson(json, MatchQueue.class);
 
-        // create the fragment and data the first time
-        if (dataFragment == null) {
-            // add the fragment
-            dataFragment = new Fragment();
-            fm.beginTransaction().add(dataFragment, "data").commit();
-            // load the data from the web
-            dataFragment.setData(loadMyData());
-        }
+        TextView textView = new TextView(this);
+        textView.setTextSize(40);
+        textView.setText(json);
 
-        // the data is available in dataFragment.getData()
     }
 
 
@@ -54,12 +57,41 @@ public class MainActivity extends ActionBarActivity {
             gotoAddEdit();
             return true;
         }
+        if (id == R.id.action_view_matches) {
+            gotoViewMatchQueue();
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onStop(){
+        super.onStop();
+        if(newMatchQueue != null && oldMatchQueue != null) {
+            //Write to oldMatchQueue in order to avoid infinte recursion as defined by Gson
+            oldMatchQueue = new MatchQueue<Match>(newMatchQueue);
+            String json = gson.toJson(oldMatchQueue);
+            // We need an Editor object to make preference changes.
+            // All objects are from android.context.Context
+            SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putString("storedJson", json);
+
+            // Commit the edits!
+            editor.commit();
+        }
+
+
+    }
+
     private void gotoAddEdit() {
         Intent intent = new Intent(this, AddEdit.class);
+        startActivity(intent);
+    }
+
+    private void gotoViewMatchQueue() {
+        Intent intent = new Intent(this, ViewMatches.class);
         startActivity(intent);
     }
 }

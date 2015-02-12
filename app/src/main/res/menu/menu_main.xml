@@ -10,7 +10,7 @@
         android:icon="@drawable/ic_action_add"
 
         app:showAsAction="ifRoom"/>
-    <item android:id="@+id/action_matches"
+    <item android:id="@+id/action_view_matches"
         android:title="View Matches"
         android:icon="@drawable/ic_action_view_matches"
 

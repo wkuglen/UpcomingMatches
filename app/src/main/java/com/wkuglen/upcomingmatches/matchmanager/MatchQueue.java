@@ -13,6 +13,15 @@ public class MatchQueue<E> {
         myQueue = new ArrayList<E>();
         front = 0;
     }
+    public MatchQueue(MatchQueue<E> oldQueue)
+    {
+        myQueue = new ArrayList<E>();
+        for(int i = 0; i < oldQueue.getSize(); i++)
+        {
+            myQueue.add(oldQueue.deQueue());
+        }
+        front = 0;
+    }
     public boolean isEmpty()
     {
         return myQueue.size()==0;
@@ -32,5 +41,9 @@ public class MatchQueue<E> {
     public int getSize()
     {
         return myQueue.size();
+    }
+
+    public ArrayList<E> getMyQueue() {
+        return myQueue;
     }
 }
