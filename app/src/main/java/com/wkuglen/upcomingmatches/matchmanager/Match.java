@@ -76,7 +76,7 @@ public class Match {
 
     @Override
     public String toString() {
-        String toReturn = "The Upcoming Match is " +
+        String toReturn = "The Match is " +
                             "#" + matchNumber +
                             " @ " + timeHour +
                             ":" + timeMinute;

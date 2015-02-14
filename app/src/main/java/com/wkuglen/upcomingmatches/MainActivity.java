@@ -84,12 +84,10 @@ public class MainActivity extends ActionBarActivity {
 
 
     }
-
     private void gotoAddEdit() {
         Intent intent = new Intent(this, AddEdit.class);
         startActivity(intent);
     }
-
     private void gotoViewMatchQueue() {
         Intent intent = new Intent(this, ViewMatches.class);
         startActivity(intent);
