@@ -26,9 +26,11 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         // Restore preferences
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         String json = settings.getString("storedJson", null);
+
         newMatchQueue = gson.fromJson(json, MatchQueue.class);
 
         TextView textView = new TextView(this);
@@ -36,6 +38,22 @@ public class MainActivity extends ActionBarActivity {
         textView.setText(json);
 
     }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Restore preferences
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        String json = settings.getString("storedJson", null);
+        newMatchQueue = gson.fromJson(json, MatchQueue.class);
+
+        System.err.println("MAIN ACTIVITY"+json);
+        TextView textView = new TextView(this);
+        textView.setTextSize(40);
+        textView.setText(json);
+    }
+
 
 
     @Override
@@ -65,6 +83,7 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /*
     @Override
     protected void onStop(){
         super.onStop();
@@ -81,9 +100,8 @@ public class MainActivity extends ActionBarActivity {
             // Commit the edits!
             editor.commit();
         }
-
-
     }
+    */
     private void gotoAddEdit() {
         Intent intent = new Intent(this, AddEdit.class);
         startActivity(intent);

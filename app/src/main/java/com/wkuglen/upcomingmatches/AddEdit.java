@@ -89,10 +89,10 @@ public class AddEdit extends ActionBarActivity {
         else {
             newMatchQueue = new MatchQueue<Match>();
         }
-        
+
         newMatchQueue.enQueue(addedMatch);
-        //MatchQueue<Match> queueToJson = new MatchQueue(newMatchQueue);
-        json = gson.toJson(newMatchQueue);
+        MatchQueue<Match> queueToJson = new MatchQueue(newMatchQueue);
+        json = gson.toJson(queueToJson);
         // We need an Editor object to make preference changes.
         // All objects are from android.context.Context
         SharedPreferences.Editor editor = settings.edit();
@@ -100,6 +100,7 @@ public class AddEdit extends ActionBarActivity {
 
         // Commit the edits!
         editor.commit();
+        System.err.println(json);
 
     }
 

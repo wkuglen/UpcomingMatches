@@ -31,7 +31,7 @@ public class ViewMatches extends ActionBarActivity {
             MatchQueue matchQueue = gson.fromJson(json, MatchQueue.class);
             List list = matchQueue.getMyQueue();
             ArrayAdapter<Match> adapter = new ArrayAdapter<Match>(this, android.R.layout.simple_list_item_1, list);
-            ListView listView = (ListView) findViewById(R.id.list_item);
+            ListView listView = new ListView(this);
             listView.setAdapter(adapter);
         }
         else
@@ -40,11 +40,30 @@ public class ViewMatches extends ActionBarActivity {
             textView.setTextSize(40);
             textView.setText(json);
         }
-
-
-
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        String json = settings.getString("storedJson", "null");
+        System.err.println(json);
+        if(!json.equals("null")) {
+            MatchQueue matchQueue = gson.fromJson(json, MatchQueue.class);
+            List list = matchQueue.getMyQueue();
+            System.err.println(list);
+            ArrayAdapter<Match> adapter = new ArrayAdapter<Match>(this, android.R.layout.simple_list_item_1, list);
+            ListView listView = new ListView(this);
+            listView.setAdapter(adapter);
+        }
+        else
+        {
+            TextView textView = new TextView(this);
+            textView.setTextSize(40);
+            textView.setText(json);
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
