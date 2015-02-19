@@ -46,4 +46,7 @@ public class MatchQueue<E> {
     public ArrayList<E> getMyQueue() {
         return myQueue;
     }
+    public String toString() {
+        return myQueue.toString();
+    }
 }

@@ -48,7 +48,7 @@ public class MainActivity extends ActionBarActivity {
         String json = settings.getString("storedJson", null);
         newMatchQueue = gson.fromJson(json, MatchQueue.class);
 
-        System.err.println("MAIN ACTIVITY"+json);
+        System.err.println("MAIN ACTIVITY "+json);
         TextView textView = new TextView(this);
         textView.setTextSize(40);
         textView.setText(json);

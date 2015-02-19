@@ -2,6 +2,7 @@ package com.wkuglen.upcomingmatches;
 
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBarActivity;
@@ -79,29 +80,32 @@ public class AddEdit extends ActionBarActivity {
         textView.setText("Added "+addedMatch.toString());
         System.err.println(addedMatch.toString());
 
-        Gson gson = new Gson();
+        Gson oldGson = new Gson();
         SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
-        String json = settings.getString("storedJson", null);
+        String oldJson = settings.getString("storedJson", null);
         MatchQueue<Match> newMatchQueue;
-        if(gson.fromJson(json, MatchQueue.class) != null) {
-            newMatchQueue = gson.fromJson(json, MatchQueue.class);
-        }
-        else {
-            newMatchQueue = new MatchQueue<Match>();
-        }
+        //if(gson.fromJson(json, MatchQueue.class) != null) {
+            newMatchQueue = new MatchQueue<Match>(oldGson.fromJson(oldJson, MatchQueue.class));
+        //}
+        //else {
+        //    newMatchQueue = new MatchQueue<Match>();
+        //}
 
         newMatchQueue.enQueue(addedMatch);
+        System.err.println("The Added Match is: "+addedMatch);
         MatchQueue<Match> queueToJson = new MatchQueue(newMatchQueue);
-        json = gson.toJson(queueToJson);
+        Gson newGson = new Gson();
+        String newJson = newGson.toJson(queueToJson);
         // We need an Editor object to make preference changes.
         // All objects are from android.context.Context
         SharedPreferences.Editor editor = settings.edit();
-        editor.putString("storedJson", json);
+        editor.putString("storedJson", newJson);
 
         // Commit the edits!
         editor.commit();
-        System.err.println(json);
+        System.err.println(newJson);
 
+        finish();
     }
 
     public static void setTime(int hour, int minute) {
