@@ -11,8 +11,8 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.wkuglen.upcomingmatches.matchmanager.Match;
-import com.wkuglen.upcomingmatches.matchmanager.MatchQueue;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -24,22 +24,6 @@ public class ViewMatches extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_matches);
-
-        SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
-        String json = settings.getString("storedJson", "null");
-        if(!json.equals("null")) {
-            MatchQueue matchQueue = gson.fromJson(json, MatchQueue.class);
-            List list = matchQueue.getMyQueue();
-            ArrayAdapter<Match> adapter = new ArrayAdapter<Match>(this, android.R.layout.simple_list_item_1, list);
-            ListView listView = new ListView(this);
-            listView.setAdapter(adapter);
-        }
-        else
-        {
-            TextView textView = new TextView(this);
-            textView.setTextSize(40);
-            textView.setText(json);
-        }
     }
 
     @Override
@@ -50,10 +34,10 @@ public class ViewMatches extends ActionBarActivity {
         String json = settings.getString("storedJson", "null");
         System.err.println(json);
         if(!json.equals("null")) {
-            MatchQueue matchQueue = gson.fromJson(json, MatchQueue.class);
-            List list = matchQueue.getMyQueue();
-            System.err.println(list);
-            ArrayAdapter<Match> adapter = new ArrayAdapter<Match>(this, android.R.layout.simple_list_item_1, list);
+            ArrayList matchList = gson.fromJson(json, ArrayList.class);
+
+            System.err.println(matchList);
+            ArrayAdapter<Match> adapter = new ArrayAdapter<Match>(this, android.R.layout.simple_list_item_1, matchList);
             ListView listView = new ListView(this);
             listView.setAdapter(adapter);
         }

@@ -11,32 +11,27 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.wkuglen.upcomingmatches.matchmanager.Match;
-import com.wkuglen.upcomingmatches.matchmanager.MatchQueue;
+
+import java.util.ArrayList;
 
 
 public class MainActivity extends ActionBarActivity {
 
     public static final String PREFS_NAME = "JsonPrefsFile";
     Gson gson = new Gson();
-    MatchQueue<Match> oldMatchQueue = new MatchQueue<Match>();
-    MatchQueue<Match> newMatchQueue;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("storedJson", null);
 
-        // Restore preferences
-        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-        String json = settings.getString("storedJson", null);
-
-        newMatchQueue = gson.fromJson(json, MatchQueue.class);
-
-        TextView textView = new TextView(this);
-        textView.setTextSize(40);
-        textView.setText(json);
-
+        // Commit the edits!
+        editor.commit();
     }
 
 
@@ -46,12 +41,15 @@ public class MainActivity extends ActionBarActivity {
         // Restore preferences
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         String json = settings.getString("storedJson", null);
-        newMatchQueue = gson.fromJson(json, MatchQueue.class);
-
-        System.err.println("MAIN ACTIVITY "+json);
+        ArrayList matchList;
+        if(json == null) {
+            matchList = gson.fromJson(json, ArrayList.class);
+        }
         TextView textView = new TextView(this);
         textView.setTextSize(40);
         textView.setText(json);
+        System.err.println("MAIN ACTIVITY "+json);
+
     }
 
 
@@ -83,25 +81,7 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /*
-    @Override
-    protected void onStop(){
-        super.onStop();
-        if(newMatchQueue != null && oldMatchQueue != null) {
-            //Write to oldMatchQueue in order to avoid infinte recursion as defined by Gson
-            oldMatchQueue = new MatchQueue<Match>(newMatchQueue);
-            String json = gson.toJson(oldMatchQueue);
-            // We need an Editor object to make preference changes.
-            // All objects are from android.context.Context
-            SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-            SharedPreferences.Editor editor = settings.edit();
-            editor.putString("storedJson", json);
 
-            // Commit the edits!
-            editor.commit();
-        }
-    }
-    */
     private void gotoAddEdit() {
         Intent intent = new Intent(this, AddEdit.class);
         startActivity(intent);

@@ -2,7 +2,6 @@ package com.wkuglen.upcomingmatches;
 
 import android.app.Dialog;
 import android.app.TimePickerDialog;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBarActivity;
@@ -14,12 +13,11 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.ToggleButton;
 
 import com.google.gson.Gson;
 import com.wkuglen.upcomingmatches.matchmanager.Match;
-import com.wkuglen.upcomingmatches.matchmanager.MatchQueue;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 
@@ -80,34 +78,56 @@ public class AddEdit extends ActionBarActivity {
         textView.setText("Added "+addedMatch.toString());
         System.err.println(addedMatch.toString());
 
-        Gson oldGson = new Gson();
+        Gson gson = new Gson();
         SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
-        String oldJson = settings.getString("storedJson", null);
-        MatchQueue<Match> newMatchQueue;
-        //if(gson.fromJson(json, MatchQueue.class) != null) {
-            newMatchQueue = new MatchQueue<Match>(oldGson.fromJson(oldJson, MatchQueue.class));
-        //}
-        //else {
-        //    newMatchQueue = new MatchQueue<Match>();
-        //}
+        String json = settings.getString("storedJson", null);
+//        System.err.println(json);
+        ArrayList newMatchList;
+        if(gson.fromJson(json, ArrayList.class) != null) {
+            newMatchList = new ArrayList<Match>(gson.fromJson(json, ArrayList.class));
+        }
+        else {
+            newMatchList = new ArrayList<Match>();
+        }
 
-        newMatchQueue.enQueue(addedMatch);
+        newMatchList.add(addedMatch);
         System.err.println("The Added Match is: "+addedMatch);
-        MatchQueue<Match> queueToJson = new MatchQueue(newMatchQueue);
-        Gson newGson = new Gson();
-        String newJson = newGson.toJson(queueToJson);
+
+        newMatchList = new ArrayList<Match>(insertionSort(newMatchList));
+
+        json = gson.toJson(newMatchList);
         // We need an Editor object to make preference changes.
         // All objects are from android.context.Context
         SharedPreferences.Editor editor = settings.edit();
-        editor.putString("storedJson", newJson);
+        editor.putString("storedJson", json);
 
         // Commit the edits!
         editor.commit();
-        System.err.println(newJson);
+        System.err.println(json);
 
         finish();
     }
 
+    public ArrayList<Match> insertionSort(ArrayList<Match> list)
+    {
+        Match now = new Match();
+        Match temp = new Match();
+        int in=0, out=0;
+        for(out=1;out<list.size();out++)
+        {
+            temp = list.get(out);//now = temp.clone(list.get(out));
+            in=out;
+            while(in>0 && (temp.getMatchNumber() < list.get(in-1).getMatchNumber()) )
+            {
+                list.set(in, list.get(in-1));//list.get(in).clone(list.get(in-1));
+                in--;
+            }//while(j>0&&name.compareTo(list[j-1].getName())<0)
+            list.set(in, temp);
+        }//for(i=1;i<size;i++)
+
+        return new ArrayList<Match>(list);
+
+    }
     public static void setTime(int hour, int minute) {
         hourToBeAdded = hour;
         minuteToBeAdded = minute;
