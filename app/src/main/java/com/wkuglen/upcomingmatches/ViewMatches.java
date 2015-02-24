@@ -10,8 +10,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.wkuglen.upcomingmatches.matchmanager.Match;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,11 +36,13 @@ public class ViewMatches extends ActionBarActivity {
         String json = settings.getString("storedJson", "null");
         System.err.println(json);
         if(!json.equals("null")) {
-            ArrayList matchList = gson.fromJson(json, ArrayList.class);
+            Type collectionType = new TypeToken<ArrayList<Match>>(){}.getType();
+            ArrayList<Match> matchList = gson.fromJson(json, collectionType);
+
 
             System.err.println(matchList);
-            ArrayAdapter<Match> adapter = new ArrayAdapter<Match>(this, android.R.layout.simple_list_item_1, matchList);
-            ListView listView = new ListView(this);
+            ArrayAdapter<Match> adapter = new ArrayAdapter<Match>(this, android.R.layout.list_content, matchList);
+            ListView listView = (ListView) findViewById(R.id.list_matches);
             listView.setAdapter(adapter);
         }
         else

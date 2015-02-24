@@ -26,6 +26,14 @@ public class Match {
         status = STATUS_IS_UPCOMING;
     }
 
+    public Match(Match toClone) {
+        this.matchNumber = toClone.getMatchNumber();
+        this.timeHour = toClone.getMatchNumber();
+        this.timeMinute = toClone.getTimeMinute();
+        this.allianceColor = toClone.getAllianceColor();
+        this.status = toClone.getStatus();
+    }
+
     public Match(int matchNumber, int timeHour, int timeMinute, boolean allianceColor, boolean status) {
         this.matchNumber = matchNumber;
         this.timeHour = timeHour;

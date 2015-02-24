@@ -13,10 +13,13 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.ToggleButton;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.wkuglen.upcomingmatches.matchmanager.Match;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -67,7 +70,10 @@ public class AddEdit extends ActionBarActivity {
         Integer matchInteger = new Integer(numberEditText.getText().toString());
 
         //Alliance Color
-        boolean toggle = Match.ALLIANCE_COLOR_BLUE;
+        boolean toggle;
+        ToggleButton allianceToggleButton = (ToggleButton) findViewById(R.id.toggle_alliance_color);
+        toggle = allianceToggleButton.isChecked();
+        //Match.ALLIANCE_COLOR_BLUE;
         //if true toggle = Blue
         //if false toggle = Red
 
@@ -81,21 +87,30 @@ public class AddEdit extends ActionBarActivity {
         Gson gson = new Gson();
         SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
         String json = settings.getString("storedJson", null);
-//        System.err.println(json);
         ArrayList newMatchList;
         if(gson.fromJson(json, ArrayList.class) != null) {
-            newMatchList = new ArrayList<Match>(gson.fromJson(json, ArrayList.class));
+            Type collectionType = new TypeToken<ArrayList<Match>>(){}.getType();
+            newMatchList = gson.fromJson(json, collectionType);
         }
         else {
             newMatchList = new ArrayList<Match>();
         }
 
-        newMatchList.add(addedMatch);
+
         System.err.println("The Added Match is: "+addedMatch);
+        Gson gson2 = new Gson();
+        if((newMatchList != null)&&(newMatchList.size()>=1)) {
+            ArrayList<Match> newJSONMatchList = insertSorted(addedMatch, newMatchList);
+            json = gson.toJson(newJSONMatchList);
+        }
+        else {
+            newMatchList.add(addedMatch);
+            ArrayList<Match> newJSONMatchList = new ArrayList<Match>(newMatchList);
+            json = gson.toJson(newJSONMatchList);
+        }
 
-        newMatchList = new ArrayList<Match>(insertionSort(newMatchList));
 
-        json = gson.toJson(newMatchList);
+
         // We need an Editor object to make preference changes.
         // All objects are from android.context.Context
         SharedPreferences.Editor editor = settings.edit();
@@ -108,30 +123,49 @@ public class AddEdit extends ActionBarActivity {
         finish();
     }
 
-    public ArrayList<Match> insertionSort(ArrayList<Match> list)
-    {
-        Match now = new Match();
-        Match temp = new Match();
-        int in=0, out=0;
-        for(out=1;out<list.size();out++)
-        {
-            temp = list.get(out);//now = temp.clone(list.get(out));
-            in=out;
-            while(in>0 && (temp.getMatchNumber() < list.get(in-1).getMatchNumber()) )
-            {
-                list.set(in, list.get(in-1));//list.get(in).clone(list.get(in-1));
-                in--;
-            }//while(j>0&&name.compareTo(list[j-1].getName())<0)
-            list.set(in, temp);
-        }//for(i=1;i<size;i++)
+    /*
+    // insertion sort for ArrayList
+    public ArrayList insertSort(ArrayList source){
 
-        return new ArrayList<Match>(list);
+        int index = 1;
 
+        while (index < source.size()){
+            //insertSorted((String)(source.get(index)), source, index);
+            index = index + 1;
+        }
+        return source;
+    }
+    */
+
+    // insert the given (City) object into the given list
+    // assuming elements 0 through index - 1 are sorted
+    // use comp for comparison
+    public ArrayList insertSorted(Match toInsert, ArrayList<Match> source){
+        int loc = source.size() - 1;
+        source.add(new Match());
+        Match pointer = source.get(loc);
+        while ((loc >= 0) &&
+                // c is smaller that the next highest element
+                (toInsert.getMatchNumber() < pointer.getMatchNumber())){
+            // move element to the right
+            source.set(loc + 1, source.get(loc));
+            loc = loc - 1;
+            if(loc>=0) {
+                pointer = source.get(loc);
+            }
+        }
+        if(loc+1 < source.size()) {
+            source.set(loc+1, toInsert);
+        }
+        else {
+            source.add(toInsert);
+
+        }
+        return new ArrayList<Match>(source);
     }
     public static void setTime(int hour, int minute) {
         hourToBeAdded = hour;
         minuteToBeAdded = minute;
-
     }
 }
 
