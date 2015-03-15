@@ -13,6 +13,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.wkuglen.upcomingmatches.matchmanager.Match;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,7 @@ public class ViewMatches extends ActionBarActivity {
 
 
             System.err.println(matchList);
-            ArrayAdapter<Match> adapter = new ArrayAdapter<Match>(this, android.R.layout.list_content, matchList);
+            ArrayAdapter<Match> adapter = new ArrayAdapter<Match>(this, android.R.layout.simple_list_item_1,  matchList);
             ListView listView = (ListView) findViewById(R.id.list_matches);
             listView.setAdapter(adapter);
         }

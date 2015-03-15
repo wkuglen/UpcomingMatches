@@ -1,6 +1,7 @@
 package com.wkuglen.upcomingmatches;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
@@ -8,10 +9,13 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.wkuglen.upcomingmatches.matchmanager.Match;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 
@@ -26,29 +30,30 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        /*
         SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("storedJson", null);
 
         // Commit the edits!
-        editor.commit();
+        editor.commit();*/
     }
 
 
     @Override
     protected void onStart() {
         super.onStart();
-        // Restore preferences
+        refreshUpcomingMatch();
+        /*// Restore preferences
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         String json = settings.getString("storedJson", null);
-        ArrayList matchList;
-        if(json == null) {
+       *//* ArrayList matchList;
+        if(json != null) {
             matchList = gson.fromJson(json, ArrayList.class);
-        }
-        TextView textView = new TextView(this);
-        textView.setTextSize(40);
+        }*//*
+        TextView textView = (TextView) findViewById(R.id.main_text_view);
         textView.setText(json);
-        System.err.println("MAIN ACTIVITY "+json);
+        System.err.println("MAIN ACTIVITY "+json);*/
 
     }
 
@@ -77,6 +82,9 @@ public class MainActivity extends ActionBarActivity {
             gotoViewMatchQueue();
             return true;
         }
+        if (id == R.id.action_delete) {
+            deleteMatchList();
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -89,5 +97,43 @@ public class MainActivity extends ActionBarActivity {
     private void gotoViewMatchQueue() {
         Intent intent = new Intent(this, ViewMatches.class);
         startActivity(intent);
+    }
+    private void deleteMatchList() {
+        SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("storedJson", null);
+
+        // Commit the edits!
+        editor.commit();
+        //Reset the Screen
+        refreshUpcomingMatch();
+        //Tell the User
+        Context context = getApplicationContext();
+        CharSequence text = "Matches Cleared";
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
+
+    }
+
+    private void refreshUpcomingMatch() {
+        // Restore preferences
+        String refreshedMatch;
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        String json = settings.getString("storedJson", null);
+
+        if(json != null) {
+            Type collectionType = new TypeToken<ArrayList<Match>>(){}.getType();
+            ArrayList<Match> matchList = gson.fromJson(json, collectionType);
+
+            refreshedMatch = matchList.get(0).toString();
+        }
+        else {
+            refreshedMatch = "Add Some Matches!";
+        }
+        TextView textView = (TextView) findViewById(R.id.main_text_view);
+        textView.setText(refreshedMatch);
+        System.err.println("MAIN ACTIVITY "+json);
     }
 }
