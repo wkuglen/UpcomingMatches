@@ -4,4 +4,10 @@
     tools:context="com.wkuglen.upcomingmatches.ViewMatches">
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="never" />
+
+    <item android:id="@+id/action_delete"
+        android:title="Delete All Matches"
+        android:icon="@drawable/ic_action_discard"
+
+        app:showAsAction="ifRoom"/>
 </menu>

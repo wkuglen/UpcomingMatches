@@ -84,10 +84,14 @@ public class Match {
 
     @Override
     public String toString() {
-        String toReturn = "The Match is " +
+        String toReturn = "Match " +
                             "#" + matchNumber +
-                            " @ " + timeHour +
-                            ":" + timeMinute;
+                            " @ " + timeHour;
+        if(timeMinute < 10) {
+            toReturn = toReturn + ":0" + timeMinute;
+        } else {
+            toReturn = toReturn + ":" + timeMinute;
+        }
         if(allianceColor == ALLIANCE_COLOR_BLUE)
             toReturn += " on the Blue Alliance.";
         if(allianceColor == ALLIANCE_COLOR_RED)

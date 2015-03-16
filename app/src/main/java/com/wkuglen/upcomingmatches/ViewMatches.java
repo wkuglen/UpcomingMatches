@@ -1,5 +1,6 @@
 package com.wkuglen.upcomingmatches;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -33,25 +35,7 @@ public class ViewMatches extends ActionBarActivity {
     protected void onStart() {
         super.onStart();
 
-        SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
-        String json = settings.getString("storedJson", "null");
-        System.err.println(json);
-        if(!json.equals("null")) {
-            Type collectionType = new TypeToken<ArrayList<Match>>(){}.getType();
-            ArrayList<Match> matchList = gson.fromJson(json, collectionType);
-
-
-            System.err.println(matchList);
-            ArrayAdapter<Match> adapter = new ArrayAdapter<Match>(this, android.R.layout.simple_list_item_1,  matchList);
-            ListView listView = (ListView) findViewById(R.id.list_matches);
-            listView.setAdapter(adapter);
-        }
-        else
-        {
-            TextView textView = new TextView(this);
-            textView.setTextSize(40);
-            textView.setText(json);
-        }
+        refreshMatchList();
     }
 
     @Override
@@ -72,7 +56,48 @@ public class ViewMatches extends ActionBarActivity {
         if (id == R.id.action_settings) {
             return true;
         }
+        if (id == R.id.action_delete) {
+            deleteMatchList();
+        }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void deleteMatchList() {
+        SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("storedJson", null);
+
+        // Commit the edits!
+        editor.commit();
+        //Refresh the screen
+        refreshMatchList();
+        //Tell the User
+        Context context = getApplicationContext();
+        CharSequence text = "Matches Cleared";
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
+
+    }
+    private void refreshMatchList() {
+        SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        String json = settings.getString("storedJson", "null");
+        System.err.println(json);
+        ArrayAdapter<Match> adapter;
+        if(!json.equals("null")) {
+            Type collectionType = new TypeToken<ArrayList<Match>>(){}.getType();
+            ArrayList<Match> matchList = gson.fromJson(json, collectionType);
+            System.err.println(matchList);
+            adapter = new ArrayAdapter<Match>(this, android.R.layout.simple_list_item_1,  matchList);
+
+        }
+        else
+        {
+            adapter = null;
+        }
+        ListView listView = (ListView) findViewById(R.id.list_matches);
+        listView.setAdapter(adapter);
     }
 }
