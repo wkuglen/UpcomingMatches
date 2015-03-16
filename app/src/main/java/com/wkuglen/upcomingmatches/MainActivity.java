@@ -82,9 +82,7 @@ public class MainActivity extends ActionBarActivity {
             gotoViewMatchQueue();
             return true;
         }
-        if (id == R.id.action_delete) {
-            deleteMatchList();
-        }
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -97,24 +95,6 @@ public class MainActivity extends ActionBarActivity {
     private void gotoViewMatchQueue() {
         Intent intent = new Intent(this, ViewMatches.class);
         startActivity(intent);
-    }
-    private void deleteMatchList() {
-        SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putString("storedJson", null);
-
-        // Commit the edits!
-        editor.commit();
-        //Reset the Screen
-        refreshUpcomingMatch();
-        //Tell the User
-        Context context = getApplicationContext();
-        CharSequence text = "Matches Cleared";
-        int duration = Toast.LENGTH_SHORT;
-
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
-
     }
 
     private void refreshUpcomingMatch() {

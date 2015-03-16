@@ -1,11 +1,20 @@
 package com.wkuglen.upcomingmatches;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ListActivity;
+import android.content.ClipData;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -23,6 +32,7 @@ import java.util.List;
 
 public class ViewMatches extends ActionBarActivity {
 
+    private int deletePosition;
     Gson gson = new Gson();
 
     @Override
@@ -81,6 +91,25 @@ public class ViewMatches extends ActionBarActivity {
         toast.show();
 
     }
+    public void deleteMatch(){
+        SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        String json = settings.getString("storedJson", "null");
+        if(json != null) {
+            Type collectionType = new TypeToken<ArrayList<Match>>() {}.getType();
+            ArrayList<Match> matchList = gson.fromJson(json, collectionType);
+            System.err.println(matchList);
+            matchList.remove(deletePosition);
+            ArrayList<Match> newJSONMatchList = new ArrayList<Match>(matchList);
+            json = gson.toJson(newJSONMatchList);
+        }
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("storedJson", json);
+
+        // Commit the edits!
+        editor.commit();
+        //Refresh the screen
+        refreshMatchList();
+    }
     private void refreshMatchList() {
         SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
         String json = settings.getString("storedJson", "null");
@@ -99,5 +128,40 @@ public class ViewMatches extends ActionBarActivity {
         }
         ListView listView = (ListView) findViewById(R.id.list_matches);
         listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+
+
+            @Override
+            public void onItemClick(AdapterView<?> adapter,View v, int position, long l){
+                System.err.println("List Clicked @ "+position);
+                deletePosition = position;
+                DialogFragment newFragment = new DeleteSingleDialogFragment();
+                newFragment.show(getSupportFragmentManager(), "deleteSingleDialog");
+            }
+
+
+        });
+    }
+}
+
+class DeleteSingleDialogFragment extends DialogFragment {
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        // Use the Builder class for convenient dialog construction
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage("Are you sure you want to delete the match?")
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // FIRE ZE MISSILES!
+                        //getActivity().deleteMatch();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User cancelled the dialog
+                    }
+                });
+        // Create the AlertDialog object and return it
+        return builder.create();
     }
 }
