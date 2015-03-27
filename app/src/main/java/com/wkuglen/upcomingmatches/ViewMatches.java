@@ -32,7 +32,6 @@ import java.util.List;
 
 public class ViewMatches extends ActionBarActivity {
 
-    private int deletePosition;
     Gson gson = new Gson();
 
     @Override
@@ -91,15 +90,16 @@ public class ViewMatches extends ActionBarActivity {
         toast.show();
 
     }
-    public void deleteMatch(){
+    private ArrayList deleteMatch(int deletePosition){
         SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
         String json = settings.getString("storedJson", "null");
+        ArrayList<Match> newJSONMatchList = null;
         if(json != null) {
             Type collectionType = new TypeToken<ArrayList<Match>>() {}.getType();
             ArrayList<Match> matchList = gson.fromJson(json, collectionType);
             System.err.println(matchList);
             matchList.remove(deletePosition);
-            ArrayList<Match> newJSONMatchList = new ArrayList<Match>(matchList);
+            newJSONMatchList = new ArrayList<Match>(matchList);
             json = gson.toJson(newJSONMatchList);
         }
         SharedPreferences.Editor editor = settings.edit();
@@ -107,10 +107,16 @@ public class ViewMatches extends ActionBarActivity {
 
         // Commit the edits!
         editor.commit();
+        /*//Reset the deleteWorthy boolean
+        DeleteSingleDialogFragment.setDeleteWorthy(false);
+        System.err.println("Reset to false");
         //Refresh the screen
-        refreshMatchList();
+        refreshMatchList();*/
+        return newJSONMatchList;
     }
     private void refreshMatchList() {
+        DeleteSingleDialogFragment.setDeleteWorthy(false);
+
         SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
         String json = settings.getString("storedJson", "null");
         System.err.println(json);
@@ -134,9 +140,13 @@ public class ViewMatches extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> adapter,View v, int position, long l){
                 System.err.println("List Clicked @ "+position);
-                deletePosition = position;
                 DialogFragment newFragment = new DeleteSingleDialogFragment();
                 newFragment.show(getSupportFragmentManager(), "deleteSingleDialog");
+                if(DeleteSingleDialogFragment.isDeleteWorthy())
+                {
+                    Context context  = getBaseContext();
+                    adapter = new ArrayAdapter<Match>(context, android.R.layout.simple_list_item_1, deleteMatch(position));
+                }
             }
 
 
@@ -145,6 +155,8 @@ public class ViewMatches extends ActionBarActivity {
 }
 
 class DeleteSingleDialogFragment extends DialogFragment {
+
+    private static boolean deleteWorthy = false;
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
@@ -154,14 +166,24 @@ class DeleteSingleDialogFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int id) {
                         // FIRE ZE MISSILES!
                         //getActivity().deleteMatch();
+                        deleteWorthy = true;
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        deleteWorthy = false;
                         // User cancelled the dialog
                     }
                 });
         // Create the AlertDialog object and return it
         return builder.create();
+    }
+
+    public static boolean isDeleteWorthy() {
+        return deleteWorthy;
+    }
+
+    public static void setDeleteWorthy(boolean deleteWorthy) {
+        DeleteSingleDialogFragment.deleteWorthy = deleteWorthy;
     }
 }
