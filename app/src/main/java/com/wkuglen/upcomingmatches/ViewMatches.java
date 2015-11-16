@@ -144,8 +144,8 @@ public class ViewMatches extends ActionBarActivity {
                 newFragment.show(getSupportFragmentManager(), "deleteSingleDialog");
                 if(DeleteSingleDialogFragment.isDeleteWorthy())
                 {
-                    Context context  = getBaseContext();
-                    adapter = new ArrayAdapter<Match>(context, android.R.layout.simple_list_item_1, deleteMatch(position));
+                    //Context context  = getBaseContext();
+                    //adapter = new ArrayAdapter<Match>(context, android.R.layout.simple_list_item_1, deleteMatch(position));
                 }
             }
 

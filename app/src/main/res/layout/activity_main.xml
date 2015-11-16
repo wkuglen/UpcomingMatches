@@ -15,16 +15,31 @@
         android:paddingRight="50dp"
         />
 
-    <TextView
-        android:id="@+id/main_text_view"
-        android:text="@string/hello_world"
-        android:textSize="@dimen/abc_text_size_large_material"
+    <LinearLayout
+
         android:layout_weight="1"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:paddingTop="50dp"
-        android:paddingBottom="50dp"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/main_text_view"
+            android:text="@string/hello_world"
+            android:textSize="@dimen/abc_text_size_large_material"
 
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="25dp"
+            android:paddingBottom="25dp"/>
+
+        <Button
+            android:id="@+id/main_next_match_button"
+            android:text="Next Match"
+            android:layout_below="@id/main_text_view"
+            android:layout_alignParentRight="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="movePointer"/>
+    </LinearLayout>
 
 
 

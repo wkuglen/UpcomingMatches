@@ -8,6 +8,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 public class MainActivity extends ActionBarActivity {
 
     public static final String PREFS_NAME = "JsonPrefsFile";
+    private static int nextMatchPointer = 0;
     Gson gson = new Gson();
 
 
@@ -107,7 +109,7 @@ public class MainActivity extends ActionBarActivity {
             Type collectionType = new TypeToken<ArrayList<Match>>(){}.getType();
             ArrayList<Match> matchList = gson.fromJson(json, collectionType);
 
-            refreshedMatch = matchList.get(0).toString();
+            refreshedMatch = matchList.get(nextMatchPointer).toString();
         }
         else {
             refreshedMatch = "Add Some Matches!";
@@ -115,5 +117,22 @@ public class MainActivity extends ActionBarActivity {
         TextView textView = (TextView) findViewById(R.id.main_text_view);
         textView.setText(refreshedMatch);
         System.err.println("MAIN ACTIVITY "+json);
+    }
+
+    public void movePointer(View view) {
+        // Restore preferences
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        String json = settings.getString("storedJson", null);
+
+        if(json != null) {
+            Type collectionType = new TypeToken<ArrayList<Match>>(){}.getType();
+            ArrayList<Match> matchList = gson.fromJson(json, collectionType);
+
+            if(nextMatchPointer+1 < matchList.size())
+                nextMatchPointer++;
+            else
+                nextMatchPointer = 0;
+        }
+        refreshUpcomingMatch();
     }
 }
